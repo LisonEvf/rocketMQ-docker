@@ -1,0 +1,5 @@
+data/namesrv/logs/*
+data/namesrv/store/*
+data/broker/logs/*
+data/broker/store/*
+.DS_Store

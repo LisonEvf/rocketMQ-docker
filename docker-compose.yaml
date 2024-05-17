@@ -1,0 +1,49 @@
+version: "3"
+services:
+  namesrv:
+    container_name: rmq-rmqnamesrv
+    image: foxiswho/rocketmq:server-4.5.1
+    restart: always
+    volumes:
+      - ./data/namesrv/logs:/opt/logs
+      - ./data/namesrv/store:/opt/store
+    ports:
+      - 9876:9876
+    environment:
+      - MAXPOSSIBLE_HEAP=100000000
+
+  broker:
+    container_name: rmq-broker
+    image: foxiswho/rocketmq:broker-4.5.1
+    restart: always
+    volumes:
+      - ./config/broker.conf:/etc/rocketmq/broker.conf
+      - ./data/broker/logs:/opt/logs
+      - ./data/broker/store:/opt/store
+    ports:
+      - 10911:10911
+      - 10909:10909
+    environment:
+      - NAMESRV_ADDR=namesrv:9876
+      - JAVA_OPTS=-Duser.home=/opt
+      - JAVA_OPT_EXT=-server -Xms512m -Xmx512m
+    links:
+      - namesrv
+    depends_on:
+      - namesrv
+
+  console:
+    container_name: rmq-console
+    image: pangliang/rocketmq-console-ng
+    restart: always
+    ports:
+      - 8088:8080
+    environment:
+      - JAVA_OPTS=-Drocketmq.config.namesrvAddr=namesrv:9876 -Drocketmq.config.isVIPChannel=false"
+    links:
+      - namesrv
+    depends_on:
+      - namesrv
+
+
+    
